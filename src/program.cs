@@ -12,18 +12,13 @@ class Program {
 	[STAThread]
 	public static void Main() {
 		var frm    = new Form();
-		var btnNav = new Button();
 		var ie     = new WebBrowserEx();
 		ie.ScriptErrorsSuppressed = false;
-		btnNav.Click += (s,e) => {
-			MessageBox.Show("Nav start");
-			ie.Navigate(@"file:///C:/Users/amiralles/dev/owc/src/index.html");
-			MessageBox.Show("Nav end");
-		};
 
-		btnNav.Text = "Nevigate!";
+		frm.Load += (s,e) =>
+			ie.Navigate(@"file:///C:/Users/amiralles/dev/owc/src/index.html");
+
 		ie.Dock= DockStyle.Fill;
-		frm.Controls.Add(btnNav);
 		frm.Controls.Add(ie);
 		frm.ShowDialog();
 
