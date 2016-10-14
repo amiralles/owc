@@ -15,8 +15,10 @@ class Program {
 		var ie     = new WebBrowserEx();
 		ie.ScriptErrorsSuppressed = false;
 
-		frm.Load += (s,e) =>
-			ie.Navigate(@"file:///C:/Users/amiralles/dev/owc/src/index.html");
+		frm.Load += (s,e) => {
+			var path = Path.GetFullPath("index.html");
+			ie.Navigate(path);
+		};
 
 		ie.Dock= DockStyle.Fill;
 		frm.Controls.Add(ie);
@@ -36,11 +38,13 @@ public class WebBrowserEx : System.Windows.Forms.WebBrowser {
 
 			WebBrowserEx _webBrowser;
 
-			public WebBrowserSiteEx(WebBrowserEx webBrowser) : base(webBrowser) {
-				_webBrowser = webBrowser;
+			public WebBrowserSiteEx(WebBrowserEx webBrowser) 
+				: base(webBrowser) {
+					_webBrowser = webBrowser;
 			}
 
-			public int QueryService(ref Guid guidService, ref Guid riid, out IntPtr ppvObject) {
+			public int QueryService(
+					ref Guid guidService, ref Guid riid, out IntPtr ppvObject) {
 				if(guidService == IID_IInternetSecurityManager &&
 						riid == IID_IInternetSecurityManager) {
 					ppvObject = Marshal.GetComInterfaceForObject(this,
@@ -59,32 +63,45 @@ public class WebBrowserEx : System.Windows.Forms.WebBrowser {
 				return Constants.INET_E_DEFAULT_ACTION;
 			}
 
-			public unsafe int MapUrlToZone(string url, int* pdwZone, int dwFlags) {
-				*pdwZone = 0;//local -> "Local", "Intranet", "Trusted", "Internet", "Restricted"
+			public unsafe int MapUrlToZone(
+					string url, int* pdwZone, int dwFlags) {
+				//"Local", "Intranet", "Trusted", "Internet", "Restricted"
+				*pdwZone = 0; // <= Local.
 				return Constants.S_OK;
 			}
 
-			public unsafe int GetSecurityId(string url, byte* pbSecurityId, int* pcbSecurityId, int dwReserved) {
+			public unsafe int GetSecurityId(
+					string url, 
+					byte* pbSecurityId, 
+					int* pcbSecurityId, 
+					int dwReserved) {
 				return Constants.INET_E_DEFAULT_ACTION;
 			}
 
-			public unsafe int ProcessUrlAction(string url, int dwAction, byte* pPolicy, int cbPolicy,
-					byte* pContext, int cbContext, int dwFlags, int dwReserved) {
+			public unsafe int ProcessUrlAction(
+					string url, int dwAction, byte* pPolicy, int cbPolicy,
+					byte* pContext, int cbContext, int dwFlags, 
+					int dwReserved) {
 				
-				WriteLine("Process URL");	
+				WriteLine("Process URL Action");	
 				*((int*)pPolicy) = (int)Constants.UrlPolicy.URLPOLICY_ALLOW;
 				return Constants.S_OK;
 			}
 
-			public unsafe int QueryCustomPolicy(string pwszUrl, void* guidKey, byte** ppPolicy, int* pcbPolicy, byte* pContext, int cbContext, int dwReserved) {
+			public unsafe int QueryCustomPolicy(
+					string pwszUrl, void* guidKey, byte** ppPolicy, 
+					int* pcbPolicy, byte* pContext, int cbContext, 
+					int dwReserved) {
 				return Constants.INET_E_DEFAULT_ACTION;
 			}
 
-			public int SetZoneMapping(int dwZone, string lpszPattern, int dwFlags) {
+			public int SetZoneMapping(
+					int dwZone, string lpszPattern, int dwFlags) {
 				return Constants.INET_E_DEFAULT_ACTION;
 			}
 
-			public unsafe int GetZoneMappings(int dwZone, void** ppenumString, int dwFlags) {
+			public unsafe int GetZoneMappings(
+					int dwZone, void** ppenumString, int dwFlags) {
 				return Constants.INET_E_DEFAULT_ACTION;
 			}
 
@@ -117,18 +134,50 @@ public interface IServiceProvider {
 public interface IInternetSecurityManager {
 	[PreserveSig]
 	unsafe int SetSecuritySite(void* pSite);
+	
 	[PreserveSig]
 	unsafe int GetSecuritySite(void** ppSite);
+	
 	[PreserveSig]
-	unsafe int MapUrlToZone([In, MarshalAs(UnmanagedType.LPWStr)] string pwszUrl, int* pdwZone, [In] int dwFlags);
+	unsafe int MapUrlToZone(
+			[In, MarshalAs(UnmanagedType.LPWStr)] string pwszUrl, 
+			int* pdwZone, 
+			[In] int dwFlags);
+
 	[PreserveSig]
-	unsafe int GetSecurityId([In, MarshalAs(UnmanagedType.LPWStr)] string pwszUrl, byte* pbSecurityId, int* pcbSecurityId, int dwReserved);
+	unsafe int GetSecurityId(
+			[In, MarshalAs(UnmanagedType.LPWStr)] string pwszUrl, 
+			byte* pbSecurityId, 
+			int* pcbSecurityId, 
+			int dwReserved);
+
 	[PreserveSig]
-	unsafe int ProcessUrlAction([In, MarshalAs(UnmanagedType.LPWStr)] string pwszUrl, int dwAction, byte* pPolicy, int cbPolicy, byte* pContext, int cbContext, int dwFlags, int dwReserved);
+	unsafe int ProcessUrlAction(
+			[In, MarshalAs(UnmanagedType.LPWStr)] string pwszUrl, 
+			int dwAction, 
+			byte* pPolicy, 
+			int cbPolicy, 
+			byte* pContext, 
+			int cbContext, 
+			int dwFlags, 
+			int dwReserved);
+
 	[PreserveSig]
-	unsafe int QueryCustomPolicy([In, MarshalAs(UnmanagedType.LPWStr)] string pwszUrl, void* guidKey, byte** ppPolicy, int* pcbPolicy, byte* pContext, int cbContext, int dwReserved);
+	unsafe int QueryCustomPolicy(
+			[In, MarshalAs(UnmanagedType.LPWStr)] string pwszUrl, 
+			void* guidKey, 
+			byte** ppPolicy, 
+			int* pcbPolicy, 
+			byte* pContext, 
+			int cbContext, 
+			int dwReserved);
+
 	[PreserveSig]
-	int SetZoneMapping(int dwZone, [In, MarshalAs(UnmanagedType.LPWStr)] string lpszPattern, int dwFlags);
+	int SetZoneMapping(
+			int dwZone, 
+			[In, MarshalAs(UnmanagedType.LPWStr)] string lpszPattern, 
+			int dwFlags);
+	
 	[PreserveSig]
 	unsafe int GetZoneMappings(int dwZone, void** ppenumString, int dwFlags);
 }
