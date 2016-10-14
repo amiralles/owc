@@ -1,6 +1,7 @@
 
 
 using System;
+using System.Drawing;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -12,6 +13,7 @@ class Program {
 	[STAThread]
 	public static void Main() {
 		var frm    = new Form();
+		frm.Size = new Size(800, 600);
 		var ie     = new WebBrowserEx();
 		ie.ScriptErrorsSuppressed = false;
 
