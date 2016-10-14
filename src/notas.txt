@@ -1,0 +1,79 @@
+
+1. Instalar OWC (Office Web Components) https://www.microsoft.com/en-us/download/details.aspx?id=22276
+
+Codigo C#
+
+1. Implementar IInternetSecurityManager. Los dos puntos importantes de 
+    esta interface son:
+	ProcessUrlAction: Tenemos que retornar URLPOLICY_ALLOW.
+	MapUrlToZone:     Tenemos que retornar 0 (local).
+
+2. Compilar para x86. Este paso es super importante porque si la 
+   plataforma no es correcta, no vamos a tener ni errores de compilacion
+   ni errores en tiempo de ejecucion que nos permitan identificar el problema.
+   Cuando se da esta situacion, el componenete simplemente deja de funcionar
+   de forma silenciasa. De nuevo, este paso es super, super importante.
+
+Codigo HTML
+
+1. Para poder utilizar OWC, tenemos que instanciar el componente utilizando
+   el CLSID que tenga Office Spread Sheets en el registro de Windows. Generalmente
+   es CLSID:0002E559-0000-0000-C000-000000000046.
+
+    <object 
+	   	    id="excel" 
+		    classid="CLSID:0002E559-0000-0000-C000-000000000046"
+		    width="100%" 
+			height="100%"
+			VIEWASTEXT>
+
+2. Una vez que importamos el componente, tenemos que configurarlo y establecer 
+   la ruta del archivo que queremos embeber. Para esto vamos a utilizar tags 
+   de tipo param:
+
+        <param name="DisplayColumnHeadings" value="-1">
+        <param name="DisplayRowHeadings" value="0">
+        <param name="DisplayToolbar" value="0">
+		<!-- <param name="XMLURL" value="file:///C:/Users/amiralles/dev/embed_excel/excel/test.xml"> -->
+		<param name="XMLURL" value="test.xml">
+
+nota: Este componente NO soporta archivos con extensiones .xls/xlsx, si o si, 
+      tienen que ser archivos Excel grabados como XML.
+
+nota: En las pruebas que realice, la ruta al archivo XML puede ser relativa o
+      absoluta. Da lo mismo. De todas formas, si por algun motivo el browser
+      no logra mostrar el contenido del archivo excel, realizar una prueba
+      utilizando rutas absolutas.
+
+Importante:
+Se asume que la configuracion de sitios de internet para *local zone* no fue 
+modificada por el usuario y mantiene los valores predeterminados. En el caso 
+de experimentar errores por este lado, resetear la configuracion a los valores 
+default o crear una nueva configuracion (que emule los defaults de local zone) 
+y ajustar el metodo *MapUrlToZone* segun corresponda.
+
+Al realizar pruebas en el browser, *NO* utilizar Microsoft Edge, este browser
+es super limitado y tiene diez mil problemas con componentes ActiveX (y falla
+de forma silenciosa, lo que hace que sea todavia peor....) Siempre
+utilizar la version full/full de internet explorer.
+
+Recursos:
+Instalador OWC.
+https://www.microsoft.com/en-us/download/details.aspx?id=22276
+
+Troubble shooting componenetes ActiveX. Si bien el tema central del post no es
+sobre como configurar la plataforma, ahi explica que pasa cuando tenemos 
+un missmatch de arquitecturas.
+https://blogs.msdn.microsoft.com/ieinternals/2011/05/04/the-web-browser-control-and-the-silent-flag/
+
+Implementacion completa de IInternetSecurityManager y una extension del
+webbrowser estandar para que utilice esta interface.
+https://searchcode.com/codesearch/view/11331098/
+
+IInternetSecurityManager Interface
+https://msdn.microsoft.com/en-us/library/ms537130(v=vs.85).aspx
+
+Como utilizar Excel desde javascript.
+http://www.rgagnon.com/jsdetails/js-0122.html
+
+

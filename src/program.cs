@@ -11,16 +11,13 @@ using static System.Console;
 class Program {
 	[STAThread]
 	public static void Main() {
-		var frm = new Form();
+		var frm    = new Form();
 		var btnNav = new Button();
-		var ie = new WebBrowserEx();
+		var ie     = new WebBrowserEx();
 		ie.ScriptErrorsSuppressed = false;
 		btnNav.Click += (s,e) => {
 			MessageBox.Show("Nav start");
 			ie.Navigate(@"file:///C:/Users/amiralles/dev/owc/src/index.html");
-			// ie.Navigate(@"C:\Users\amiralles\dev\owc\src\index.html");
-			//ie.Navigate(@"C:\Users\amiralles\dev\owc\src\test.xml");
-			// ie.Navigate(@"C:\Users\amiralles\dev\owc\src\test.xlsx");
 			MessageBox.Show("Nav end");
 		};
 
